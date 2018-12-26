@@ -8,32 +8,39 @@ using System.Dynamic;
 
 namespace ObjetoDinamico
 {
-    public enum StringSearchOption
+    public enum OpcionCadenaBusqueda
     {
         StartsWith,
         Contains,
         EndsWith
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     class ReadOnlyFile : DynamicObject
     {
-        // Store the path to the file and the initial line count value.
+        // Almacena la ruta al fichero y el valor de la cuenta inicial de línea.
         private string p_filePath;
-
-        // Public constructor. Verify that file exists and store the path in 
-        // the private variable.
-        public ReadOnlyFile(string filePath)
-        {
-            if (!File.Exists(filePath))
-            {
-                throw new Exception("File path does not exist.");
-            }
-
-            p_filePath = filePath;
+        
+        /// <summary>
+        /// Constructor público. Verifica que el fichero existe y aalmacena la ruta en la variable privada
+        /// </summary>
+        /// <param name="rutaFichero">Ruta del fichero</param>
+        public ReadOnlyFile(string rutaFichero)        {
+            if (!File.Exists(rutaFichero))  throw new Exception("La ruta del fichero no existe.");
+            p_filePath = rutaFichero;
         }
 
-        public List<string> GetPropertyValue(string propertyName,
-                                     StringSearchOption StringSearchOption = StringSearchOption.StartsWith,
+        /// <summary>
+        /// Obtiene una propiedad definidda en el fichero
+        /// </summary>
+        /// <param name="nombrePropiedad">Nombre de propiedad a buscar en el fichero.</param>
+        /// <param name="OpcionCadenaBusqueda">Permite escoger el tipo de búsqueda a realizar sobre cada línea (StartsWith, Contains, EndsWith).</param>
+        /// <param name="trimSpaces">Permite escoger si realiza distinción entre mayúsculas o no (true, false).</param>
+        /// <returns></returns>
+        public List<string> GetPropertyValue(string nombrePropiedad,
+                                     StringSearchOption OpcionCadenaBusqueda = OpcionCadenaBusqueda.StartsWith,
                                      bool trimSpaces = true)
         {
             StreamReader sr = null;
@@ -49,27 +56,26 @@ namespace ObjetoDinamico
                 {
                     line = sr.ReadLine();
 
-                    // Perform a case-insensitive search by using the specified search options.
+                    // Realiza una búsqueda sensible a mayúsculas usando las opciones de búsqueda especificadas.
                     testLine = line.ToUpper();
-                    if (trimSpaces) { testLine = testLine.Trim(); }
+                    if (trimSpaces) testLine = testLine.Trim();
 
-                    switch (StringSearchOption)
-                    {
+                    switch (StringSearchOption)                    {
                         case StringSearchOption.StartsWith:
-                            if (testLine.StartsWith(propertyName.ToUpper())) { results.Add(line); }
+                            if (testLine.StartsWith(nombrePropiedad.ToUpper())) { results.Add(line); }
                             break;
                         case StringSearchOption.Contains:
-                            if (testLine.Contains(propertyName.ToUpper())) { results.Add(line); }
+                            if (testLine.Contains(nombrePropiedad.ToUpper())) { results.Add(line); }
                             break;
                         case StringSearchOption.EndsWith:
-                            if (testLine.EndsWith(propertyName.ToUpper())) { results.Add(line); }
+                            if (testLine.EndsWith(nombrePropiedad.ToUpper())) { results.Add(line); }
                             break;
                     }
                 }
             }
             catch
             {
-                // Trap any exception that occurs in reading the file and return null.
+                // Recoge cualquier excepción que ocurra durante la lectura del fichero y devuelve nulo.
                 results = null;
             }
             finally
@@ -78,7 +84,13 @@ namespace ObjetoDinamico
             }
             return results;
         }
-        // Implement the TryGetMember method of the DynamicObject class for dynamic member calls.
+        
+        /// <summary>
+        /// Implementa el método TryGetMember de la clase DynamicObject para la llamada de miembros dinámicos.
+        /// </summary>
+        /// <param name="binder"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
         public override bool TryGetMember(GetMemberBinder binder,
                                           out object result)
         {
@@ -86,8 +98,13 @@ namespace ObjetoDinamico
             return result == null ? false : true;
         }
 
-        // Implement the TryInvokeMember method of the DynamicObject class for 
-        // dynamic member calls that have arguments.
+        /// <summary>
+        /// Implementa el método TryInvokeMember de la clase DynamicObject para llamadas de miembros dinámicos que tienen argumentos.
+        /// </summary>
+        /// <param name="binder"></param>
+        /// <param name="args"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
         public override bool TryInvokeMember(InvokeMemberBinder binder,
                                              object[] args,
                                              out object result)
@@ -101,7 +118,7 @@ namespace ObjetoDinamico
             }
             catch
             {
-                throw new ArgumentException("StringSearchOption argument must be a StringSearchOption enum value.");
+                throw new ArgumentException("Los argumentos StringSearchOption deben ser un valor de enumerador StringSearchOption.");
             }
 
             try
@@ -110,7 +127,7 @@ namespace ObjetoDinamico
             }
             catch
             {
-                throw new ArgumentException("trimSpaces argument must be a Boolean value.");
+                throw new ArgumentException("El argumento trimSpaces debe ser un valor Booleano.");
             }
 
             result = GetPropertyValue(binder.Name, StringSearchOption, trimSpaces);
