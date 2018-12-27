@@ -9,7 +9,7 @@ using System.Dynamic;
 namespace ObjetoDinamico
 {
     /// <summary>
-    /// Criterios de búsqueda de cadena de caracteres.
+    /// Criterios de bÃºsqueda de cadena de caracteres.
     /// </summary>
     public enum OpcionCadenaBusqueda
     {
@@ -17,17 +17,27 @@ namespace ObjetoDinamico
         Contains,
         EndsWith
     }
+    
+    /// <summary>
+    /// Opciones de conversiÃ³n de datos
+    /// </summary>
+    public enum OpcionConversionDato
+    {
+        Fixed,
+        Cast,
+        Round
+    }
 
     /// <summary>
-    /// Definición de fichero de sólo lectura con parámetros dinámicos.
+    /// DefiniciÃ³n de fichero de sÃ³lo lectura con parÃ¡metros dinÃ¡micos.
     /// </summary>
     class ReadOnlyFile : DynamicObject
     {
-        // Almacena la ruta al fichero y el valor de la cuenta inicial de línea.
+        // Almacena la ruta al fichero y el valor de la cuenta inicial de lÃ­nea.
         private string p_filePath;
         
         /// <summary>
-        /// Constructor público. Verifica que el fichero existe y aalmacena la ruta en la variable privada
+        /// Constructor pÃºblico. Verifica que el fichero existe y aalmacena la ruta en la variable privada
         /// </summary>
         /// <param name="rutaFichero">Ruta del fichero</param>
         public ReadOnlyFile(string rutaFichero)        {
@@ -39,8 +49,8 @@ namespace ObjetoDinamico
         /// Obtiene una propiedad definidda en el fichero
         /// </summary>
         /// <param name="nombrePropiedad">Nombre de propiedad a buscar en el fichero.</param>
-        /// <param name="OpcionCadenaBusqueda">Permite escoger el tipo de búsqueda a realizar sobre cada línea (StartsWith, Contains, EndsWith).</param>
-        /// <param name="trimSpaces">Permite escoger si realiza distinción entre mayúsculas o no (true, false).</param>
+        /// <param name="OpcionCadenaBusqueda">Permite escoger el tipo de bÃºsqueda a realizar sobre cada lÃ­nea (StartsWith, Contains, EndsWith).</param>
+        /// <param name="trimSpaces">Permite escoger si realiza distinciÃ³n entre mayÃºsculas o no (true, false).</param>
         /// <returns></returns>
         public List<string> GetPropertyValue(string nombrePropiedad,
                                      OpcionCadenaBusqueda OpcionCadenaBusqueda = OpcionCadenaBusqueda.StartsWith,
@@ -59,7 +69,7 @@ namespace ObjetoDinamico
                 {
                     line = sr.ReadLine();
 
-                    // Realiza una búsqueda sensible a mayúsculas usando las opciones de búsqueda especificadas.
+                    // Realiza una bÃºsqueda sensible a mayÃºsculas usando las opciones de bÃºsqueda especificadas.
                     testLine = line.ToUpper();
                     if (trimSpaces) testLine = testLine.Trim();
 
@@ -78,7 +88,7 @@ namespace ObjetoDinamico
             }
             catch
             {
-                // Recoge cualquier excepción que ocurra durante la lectura del fichero y devuelve nulo.
+                // Recoge cualquier excepciÃ³n que ocurra durante la lectura del fichero y devuelve nulo.
                 results = null;
             }
             finally
@@ -89,7 +99,7 @@ namespace ObjetoDinamico
         }
         
         /// <summary>
-        /// Implementa el método TryGetMember de la clase DynamicObject para la llamada de miembros dinámicos.
+        /// Implementa el mÃ©todo TryGetMember de la clase DynamicObject para la llamada de miembros dinÃ¡micos.
         /// </summary>
         /// <param name="binder"></param>
         /// <param name="result"></param>
@@ -102,7 +112,7 @@ namespace ObjetoDinamico
         }
 
         /// <summary>
-        /// Implementa el método TryInvokeMember de la clase DynamicObject para llamadas de miembros dinámicos que tienen argumentos.
+        /// Implementa el mÃ©todo TryInvokeMember de la clase DynamicObject para llamadas de miembros dinÃ¡micos que tienen argumentos.
         /// </summary>
         /// <param name="binder"></param>
         /// <param name="args"></param>
