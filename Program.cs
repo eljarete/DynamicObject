@@ -8,6 +8,9 @@ using System.Dynamic;
 
 namespace ObjetoDinamico
 {
+    /// <summary>
+    /// Criterios de búsqueda de cadena de caracteres.
+    /// </summary>
     public enum OpcionCadenaBusqueda
     {
         StartsWith,
@@ -16,7 +19,7 @@ namespace ObjetoDinamico
     }
 
     /// <summary>
-    /// 
+    /// Definición de fichero de sólo lectura con parámetros dinámicos.
     /// </summary>
     class ReadOnlyFile : DynamicObject
     {
@@ -40,7 +43,7 @@ namespace ObjetoDinamico
         /// <param name="trimSpaces">Permite escoger si realiza distinción entre mayúsculas o no (true, false).</param>
         /// <returns></returns>
         public List<string> GetPropertyValue(string nombrePropiedad,
-                                     StringSearchOption OpcionCadenaBusqueda = OpcionCadenaBusqueda.StartsWith,
+                                     OpcionCadenaBusqueda OpcionCadenaBusqueda = OpcionCadenaBusqueda.StartsWith,
                                      bool trimSpaces = true)
         {
             StreamReader sr = null;
@@ -60,14 +63,14 @@ namespace ObjetoDinamico
                     testLine = line.ToUpper();
                     if (trimSpaces) testLine = testLine.Trim();
 
-                    switch (StringSearchOption)                    {
-                        case StringSearchOption.StartsWith:
+                    switch (OpcionCadenaBusqueda)                    {
+                        case OpcionCadenaBusqueda.StartsWith:
                             if (testLine.StartsWith(nombrePropiedad.ToUpper())) { results.Add(line); }
                             break;
-                        case StringSearchOption.Contains:
+                        case OpcionCadenaBusqueda.Contains:
                             if (testLine.Contains(nombrePropiedad.ToUpper())) { results.Add(line); }
                             break;
-                        case StringSearchOption.EndsWith:
+                        case OpcionCadenaBusqueda.EndsWith:
                             if (testLine.EndsWith(nombrePropiedad.ToUpper())) { results.Add(line); }
                             break;
                     }
@@ -109,16 +112,16 @@ namespace ObjetoDinamico
                                              object[] args,
                                              out object result)
         {
-            StringSearchOption StringSearchOption = StringSearchOption.StartsWith;
+            OpcionCadenaBusqueda OpcionCadenaBusqueda = OpcionCadenaBusqueda.StartsWith;
             bool trimSpaces = true;
 
             try
             {
-                if (args.Length > 0) { StringSearchOption = (StringSearchOption)args[0]; }
+                if (args.Length > 0) { OpcionCadenaBusqueda = (OpcionCadenaBusqueda)args[0]; }
             }
             catch
             {
-                throw new ArgumentException("Los argumentos StringSearchOption deben ser un valor de enumerador StringSearchOption.");
+                throw new ArgumentException("Los argumentos OpcionCadenaBusqueda deben ser un valor de enumerador OpcionCadenaBusqueda.");
             }
 
             try
@@ -130,7 +133,7 @@ namespace ObjetoDinamico
                 throw new ArgumentException("El argumento trimSpaces debe ser un valor Booleano.");
             }
 
-            result = GetPropertyValue(binder.Name, StringSearchOption, trimSpaces);
+            result = GetPropertyValue(binder.Name, OpcionCadenaBusqueda, trimSpaces);
 
             return result == null ? false : true;
         }
@@ -141,12 +144,12 @@ namespace ObjetoDinamico
         static void Main(string[] args)
         {
             dynamic rFile = new ReadOnlyFile(@"..\..\TextFile1.txt");
-            foreach (string line in rFile.Customer)
+            foreach (string line in rFile.Supplier)
             {
                 Console.WriteLine(line);
             }
             Console.WriteLine("----------------------------");
-            foreach (string line in rFile.Customer(StringSearchOption.Contains, true))
+            foreach (string line in rFile.Customer(OpcionCadenaBusqueda.Contains, true))
             {
                 Console.WriteLine(line);
             }
